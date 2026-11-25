@@ -1,12 +1,16 @@
-import React, {useRef} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {Image, Pressable, StyleSheet, Text, View, useWindowDimensions} from 'react-native';
 import {useSelector} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import PrimaryButton from '../../components/PrimaryButton';
+import {loadDeviceConfig} from '../../services/deviceConfig';
 
 export default function WelcomeScreen({navigation}) {
   const brand = useSelector(state => state.settings.brand);
   const {width} = useWindowDimensions();
+  const [backend, setBackend] = useState(null);
+  const [backendReady, setBackendReady] = useState(false);
   const holdTimer = useRef(null);
   const tablet = width >= 700;
 
@@ -16,6 +20,17 @@ export default function WelcomeScreen({navigation}) {
   const cancelAdminHold = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
   };
+  const refreshBackend = useCallback(async () => {
+    try {setBackend((await loadDeviceConfig()).backend);} catch {setBackend(null);}
+    finally {setBackendReady(true);}
+  }, []);
+  useFocusEffect(useCallback(() => {
+    refreshBackend();
+    const timer = setInterval(refreshBackend, 5000);
+    return () => clearInterval(timer);
+  }, [refreshBackend]));
+  const backendUnavailable = backend && backend.mode !== 'standalone' && backend.connectionStatus !== 'connected';
+  const pauseBooth = !backendReady || Boolean(backendUnavailable && !backend.continueOffline);
 
   return (
     <SafeAreaView style={[styles.safe, {backgroundColor: brand.colors.cream}]}>
@@ -44,8 +59,8 @@ export default function WelcomeScreen({navigation}) {
             {brand.eventName ? <Text style={[styles.event, {color: brand.colors.muted}]}>{brand.eventName}</Text> : null}
             <Text style={[styles.title, {color: brand.colors.ink}, tablet && styles.tabletTitle]}>{brand.welcomeMessage}</Text>
             <Text style={[styles.body, {color: brand.colors.muted}]}>{brand.instruction}</Text>
-            <PrimaryButton title="Start photo booth" onPress={() => navigation.navigate('BoothReady')} style={[styles.startButton, {backgroundColor: brand.colors.coral}]} />
-            <Text style={[styles.footnote, {color: brand.colors.muted}]}>Photos stay on this kiosk unless you choose digital delivery.</Text>
+            <PrimaryButton title="Start photo booth" onPress={() => navigation.navigate('BoothReady')} disabled={pauseBooth} style={[styles.startButton, {backgroundColor: brand.colors.coral}]} />
+            <Text style={[styles.footnote, {color: brand.colors.muted}]}>{!backendReady ? 'Loading kiosk settings…' : pauseBooth ? 'The configured backend is not confirmed as reachable. Ask the administrator to reconnect or allow offline operation.' : backend?.mode === 'standalone' ? 'Standalone mode: photos stay on this kiosk and digital delivery is off.' : 'Photos are kept on this kiosk unless a supported digital delivery feature is enabled.'}</Text>
           </View>
           <View style={styles.art} accessibilityElementsHidden>
             <View style={styles.sun} />

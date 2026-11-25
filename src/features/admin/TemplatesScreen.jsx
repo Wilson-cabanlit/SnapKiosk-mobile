@@ -49,7 +49,7 @@ export default function TemplatesScreen() {
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.kicker}>PHOTO LAYOUTS</Text>
         <Text style={styles.title}>Templates</Text>
-        <Text style={styles.description}>Add and enable photo-print layouts for future booth sessions. Each photo fills one slot; the same layout is used in preview and on the receipt.</Text>
+        <Text style={styles.description}>These are local layouts and drafts stored on this kiosk. Centrally published Web templates sync separately and remain read-only here. Each photo fills one slot; the same layout is used in preview and on the receipt.</Text>
         {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
         {templates.map(template => (
           <View key={template.id} style={styles.card}>
@@ -57,7 +57,7 @@ export default function TemplatesScreen() {
               <TextInput value={template.name} onChangeText={name => setTemplates(current => current.map(item => item.id === template.id ? {...item, name} : item))} onEndEditing={() => updateTemplate(template.id, {name: template.name.trim()})} style={styles.name} maxLength={48} accessibilityLabel="Template name" />
               <Switch value={template.enabled} onValueChange={enabled => updateTemplate(template.id, {enabled})} accessibilityLabel={`Enable ${template.name}`} />
             </View>
-            <Text style={styles.meta}>{PRESETS[template.presetId]?.label || 'Custom layout'} · {template.photoSlots.length} photo{template.photoSlots.length === 1 ? '' : 's'} · {template.canvas.width}:{template.canvas.height}</Text>
+            <Text style={styles.meta}>LOCAL {template.status === 'draft' ? 'DRAFT' : 'TEMPLATE'} · {PRESETS[template.presetId]?.label || 'Custom layout'} · {template.photoSlots.length} photo{template.photoSlots.length === 1 ? '' : 's'} · {template.canvas.width}:{template.canvas.height}</Text>
             <View style={styles.previewRow}>
               {template.photoSlots.map((slot, index) => <View key={`${template.id}-slot-${index}`} style={[styles.slot, {left: `${slot.x * 100}%`, top: `${slot.y * 100}%`, width: `${slot.width * 100}%`, height: `${slot.height * 100}%`}]} />)}
             </View>

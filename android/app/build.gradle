@@ -84,6 +84,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        // Local Server Mode permits HTTP to an administrator-configured LAN host.
+        // Online Server Mode is enforced as HTTPS in the app's URL validation.
+        manifestPlaceholders = [usesCleartextTraffic: "true"]
     }
     signingConfigs {
         debug {

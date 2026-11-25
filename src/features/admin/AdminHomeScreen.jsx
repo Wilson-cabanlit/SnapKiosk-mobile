@@ -13,9 +13,10 @@ export default function AdminHomeScreen({navigation}) {
   const dispatch = useDispatch();
   const brand = useSelector(state => state.settings.brand);
   const {width} = useWindowDimensions();
-  const [metrics, setMetrics] = useState({sessions: 0, active: 0, pending: 0, delivery: false});
+  const [metrics, setMetrics] = useState({sessions: 0, active: 0, pending: 0, backendMode: 'standalone', backendStatus: 'standalone'});
   const [loadError, setLoadError] = useState('');
   const columns = width > 850 ? 2 : 1;
+  const backendStatusLabel = {connected: 'Connected', partial: 'Partially connected', disconnected: 'Disconnected', 'not-tested': 'Not tested', standalone: 'Standalone offline'}[metrics.backendMode === 'standalone' ? 'standalone' : metrics.backendStatus] || 'Not tested';
   const signOut = () => {dispatch(lockAdmin()); navigation.popToTop();};
 
   const refreshMetrics = useCallback(async () => {
@@ -25,7 +26,8 @@ export default function AdminHomeScreen({navigation}) {
         sessions: sessions.length,
         active: sessions.filter(session => !['complete', 'cancelled'].includes(session.status)).length,
         pending: jobs.filter(job => ['queued', 'printing', 'failed'].includes(job.status)).length,
-        delivery: Boolean(config.delivery.enabled && config.delivery.apiBaseUrl),
+        backendMode: config.backend?.mode || 'standalone',
+        backendStatus: config.backend?.connectionStatus || 'not-tested',
       });
       setLoadError('');
     } catch (error) {setLoadError(error?.message || 'Could not load dashboard metrics.');}
@@ -41,11 +43,11 @@ export default function AdminHomeScreen({navigation}) {
         </View>
         <Text style={styles.section}>System overview</Text>
         <View style={[styles.grid, columns === 2 && styles.twoCol]}>
-          <View style={[styles.status, styles.wide]}><Text style={styles.label}>KIOSK SETUP</Text><Text style={styles.value}>Configuration ready</Text><Text style={styles.note}>Camera capture is integrated and needs a native rebuild. Bluetooth printer transport and private delivery still need their adapters. Branding, templates, workflow, and printer preferences save locally.</Text></View>
+          <View style={[styles.status, styles.wide]}><Text style={styles.label}>KIOSK SETUP</Text><Text style={styles.value}>Configuration ready</Text><Text style={styles.note}>Capture, layouts, composition, history, and printing run locally. Pair this kiosk with an assigned event to upload the digital layout and receipt image and show a private guest QR link after printing.</Text></View>
           <View style={styles.status}><Text style={styles.label}>BUSINESS</Text><Text style={styles.value}>{brand.businessName}</Text><Text style={styles.note}>{brand.eventName || 'No active event profile'}</Text></View>
           <View style={styles.status}><Text style={styles.label}>SESSIONS</Text><Text style={styles.value}>{metrics.sessions} total · {metrics.active} active</Text><Text style={styles.note}>Session metadata stored on this kiosk.</Text></View>
           <View style={styles.status}><Text style={styles.label}>PRINT QUEUE</Text><Text style={styles.value}>{metrics.pending} pending</Text><Text style={styles.note}>Printer transport is still required to print jobs.</Text></View>
-          <View style={styles.status}><Text style={styles.label}>DIGITAL DELIVERY</Text><Text style={styles.value}>{metrics.delivery ? 'Configured' : 'Not configured'}</Text><Text style={styles.note}>{metrics.delivery ? 'Backend URL is saved; upload adapter is still required.' : 'Set a backend URL and enable delivery in settings.'}</Text></View>
+          <View style={styles.status}><Text style={styles.label}>BACKEND</Text><Text style={styles.value}>{backendStatusLabel}</Text><Text style={styles.note}>{metrics.backendMode === 'local' ? 'Local server mode' : metrics.backendMode === 'online' ? 'Online server mode' : 'API and gallery are disabled.'}</Text></View>
         </View>
         {loadError ? <Text accessibilityRole="alert" style={styles.error}>{loadError}</Text> : null}
         <Text style={styles.section}>Setup and management</Text>
@@ -53,7 +55,7 @@ export default function AdminHomeScreen({navigation}) {
         <PrimaryButton title="Manage photo templates" onPress={() => navigation.navigate('Templates')} style={styles.settingsButton} />
         <PrimaryButton title="Customize print layout" onPress={() => navigation.navigate('PrintLayoutEditor')} style={styles.settingsButton} />
         <PrimaryButton title="Configure printer profile" onPress={() => navigation.navigate('PrinterSettings')} style={styles.settingsButton} />
-        <PrimaryButton title="Set up digital delivery" onPress={() => navigation.navigate('DeliverySettings')} style={styles.settingsButton} />
+        <PrimaryButton title="Configure backend connection" onPress={() => navigation.navigate('DeliverySettings')} style={styles.settingsButton} />
         <PrimaryButton title="Set customer workflow" onPress={() => navigation.navigate('WorkflowSettings')} style={styles.settingsButton} />
         <PrimaryButton title="View session history" onPress={() => navigation.navigate('SessionHistory')} style={styles.settingsButton} />
         <PrimaryButton title="Manage print queue" onPress={() => navigation.navigate('PrintQueue')} style={styles.settingsButton} />

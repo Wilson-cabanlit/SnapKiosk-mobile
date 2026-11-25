@@ -8,6 +8,8 @@ node_modules/
 # React Native / Metro caches
 .metro-health-check*
 .expo/
+.idea/
+*.iml
 
 # Android local settings, caches, native builds, and signing files
 android/local.properties

@@ -6,18 +6,22 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {store} from './src/store';
 import RootNavigator from './src/app/RootNavigator';
 import {loadBrand} from './src/services/brandSettings';
+import {startBackendMonitor} from './src/services/backendConnection';
+import {startEventSyncMonitor} from './src/services/eventSync';
 import {setBrand} from './src/store/settingsSlice';
 
 export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const stopBackendMonitor = startBackendMonitor();
+    const stopEventSyncMonitor = startEventSyncMonitor();
     let mounted = true;
     loadBrand()
       .then(brand => store.dispatch(setBrand(brand)))
       .catch(() => {})
       .finally(() => {if (mounted) setReady(true);});
-    return () => {mounted = false;};
+    return () => {mounted = false; stopBackendMonitor(); stopEventSyncMonitor();};
   }, []);
 
   return (

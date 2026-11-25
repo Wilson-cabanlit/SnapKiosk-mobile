@@ -3,12 +3,12 @@ const AsyncStorage = require('@react-native-async-storage/async-storage').defaul
 const SESSION_KEY = 'snapkiosk.sessions.v1';
 const FLOW = ['consent', 'layout', 'capture', 'review', 'compose', 'print', 'delivery', 'complete', 'cancelled'];
 
-function createSession({templateId, eventName, consentAt = new Date().toISOString()}) {
+function createSession({templateId, templateSnapshot = null, eventName, consentAt = new Date().toISOString()}) {
   const now = new Date().toISOString();
   return {
     id: `session-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
     createdAt: now, updatedAt: now, completedAt: null, status: 'consent',
-    consentAt, templateId, eventName: eventName || '', photos: [],
+    consentAt, templateId, templateSnapshot: templateSnapshot ? JSON.parse(JSON.stringify(templateSnapshot)) : null, eventName: eventName || '', photos: [],
     printJobs: [], uploadStatus: 'not-configured', downloadUrl: null,
   };
 }

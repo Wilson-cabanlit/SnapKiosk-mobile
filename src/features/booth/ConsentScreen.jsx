@@ -14,7 +14,7 @@ export default function ConsentScreen({navigation}) {
         <Text style={styles.body}>{brand.businessName} will use the kiosk camera to take the photos you choose during this session.</Text>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Photo privacy</Text>
-          <Text style={styles.cardBody}>Photos are intended to stay on this kiosk unless digital delivery is configured and you choose it. You can stop before capture. This demo flow does not access the camera or take a photo.</Text>
+          <Text style={styles.cardBody}>Photos are captured for this session and stay on this kiosk unless a supported digital delivery feature is enabled and you choose to share them. You can stop before capture.</Text>
         </View>
         <Text style={styles.note}>By continuing, you confirm that everyone in your group agrees to be photographed.</Text>
         <PrimaryButton title="I agree — choose a layout" onPress={() => navigation.navigate('LayoutSelection', {consentAt: new Date().toISOString()})} style={styles.button} />
