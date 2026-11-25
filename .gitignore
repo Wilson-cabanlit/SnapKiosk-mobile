@@ -1,0 +1,76 @@
+# JavaScript dependencies and package-manager caches
+node_modules/
+.npm/
+.yarn/cache/
+.yarn/unplugged/
+.pnp.*
+
+# React Native / Metro caches
+.metro-health-check*
+.expo/
+
+# Android local settings, caches, native builds, and signing files
+android/local.properties
+android/.gradle/
+android/.cxx/
+android/build/
+android/app/build/
+android/app/.cxx/
+android/app/debug.keystore
+android/app/release/
+*.keystore
+*.jks
+*.aab
+*.apk
+
+# iOS dependencies, generated builds, and machine-specific Xcode state
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/.xcode.env.local
+ios/**/xcuserdata/
+*.xcuserstate
+*.xcuserdatad/
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+*.xcarchive/
+*.ipa
+*.dSYM/
+
+# Local environment and secret/configuration files
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+google-services.json
+GoogleService-Info.plist
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+secrets/
+credentials/
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.swp
+*.tmp
+
+# Local kiosk data and customer media; keep shipped app assets tracked
+**/captures/
+**/customer-photos/
+**/customer_photos/
+**/customerPhotos/
+**/photo-sessions/
+**/session-photos/
+**/kiosk-data/
+**/user-data/
+**/gallery/
+**/print-output/
